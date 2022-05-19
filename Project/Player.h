@@ -4,12 +4,15 @@
 
 // ˆÚ“®‘¬“x
 #define PLAYER_SPEED		(0.1f)
+#define MAX_SKILL           (100.0)
 
 class CPlayer{
 private:
 	CMeshContainer	m_Mesh;
 	CVector3		m_Pos;
 	float			m_RotZ;
+	float           m_Speed;
+	float			SkillTimer;
 public:
 	CPlayer();
 	~CPlayer();

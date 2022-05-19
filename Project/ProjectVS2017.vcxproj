@@ -97,12 +97,14 @@
   <ItemGroup>
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Stage.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameDefine.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Stage.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
