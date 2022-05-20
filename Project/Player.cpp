@@ -1,5 +1,7 @@
 #include "Player.h"
 
+
+
 /**
  * コンストラクタ
  */
@@ -8,7 +10,11 @@ m_Mesh(),
 m_Pos(0.0f,0.0f,0.0f),
 m_RotZ(0.0f),
 m_Speed(0.0f),
-SkillTimer(0.0f){
+SkillTimer(0.0f),
+m_ShotMesh(),
+m_ShotArray(),
+m_ShotWait()
+{
 }
 
 /**
@@ -25,6 +31,13 @@ bool CPlayer::Load(void){
 	if (!m_Mesh.Load("player.mom"))
 		return false;
 
+	if (!m_ShotMesh.Load("pshot.mom"))
+		return false;
+
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++) {
+		m_ShotArray[i].SetMesh(&m_ShotMesh);
+	}
+
 	return true;
 }
 
@@ -37,6 +50,12 @@ void CPlayer::Initialize(void){
 	m_Speed = 0.1f;
 
 	SkillTimer = 100.0;
+
+
+
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++) {
+		m_ShotArray[i].Initialize();
+	}
 }
 
 /**
@@ -53,6 +72,13 @@ void CPlayer::Update(void){
 		m_Speed = 0.3f;
 		RotSpeed = MOF_ToRadian(20);
 		SkillTimer -= 1.0;
+	}
+	else if (g_pInput->IsKeyHold(MOFKEY_Z)) {
+		m_Speed = 0.05f;
+		RotSpeed = MOF_ToRadian(7);
+
+		if(SkillTimer<MAX_SKILL)
+		SkillTimer += 0.3;
 	}
 	else 
 	{
@@ -90,6 +116,50 @@ void CPlayer::Update(void){
 		m_RotZ += Roll;
 
 	m_RotZ -= copysignf(min(RotSpeed, abs(m_RotZ)), m_RotZ);
+
+
+	if (m_ShotWait <= 0) {
+		if (g_pInput->IsKeyHold(MOFKEY_SPACE)) {
+
+
+
+			for (int cnt = 0; cnt < 2; cnt++) {
+				for (int i = 0; i < PLAYERSHOT_COUNT; i++) {
+					if (m_ShotArray[i].GetShow())
+						continue;
+
+					CVector3 Shotpos(0.4f * (cnt * 2 - 1), 0, 0);
+					Shotpos.RotationZ(m_RotZ);
+					Shotpos += m_Pos;
+					m_ShotWait = PLAYERSHOT_WAIT;
+					m_ShotArray[i].Fire(Shotpos);
+					break;
+				}
+			}
+		}
+
+		else if (g_pInput->IsKeyHold(MOFKEY_Z)) {
+			for (int i = 0; i < PLAYERSHOT_COUNT; i++) {
+				if (m_ShotArray[i].GetShow())
+					continue;
+
+				CVector3 Shotpos(0.0f , 0, 0);
+				Shotpos.RotationZ(m_RotZ);
+				Shotpos += m_Pos;
+				m_ShotWait = PLAYERSHOT_WAIT/2;
+				m_ShotArray[i].Fire(Shotpos);
+				break;
+			}
+		}
+
+	}
+	else {
+		m_ShotWait--;
+	}
+
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++) {
+		m_ShotArray[i].Update();
+	}
 }
 
 /**
@@ -101,8 +171,12 @@ void CPlayer::Render(void){
 	matWorld.SetTranslation(m_Pos);
 	m_Mesh.Render(matWorld);
 
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++) {
+		m_ShotArray[i].Render();
+	}
+
 	for (int i = 0; i < SkillTimer; i++) {
-		CGraphicsUtilities::RenderString(800+i, 0, MOF_XRGB(0, 0, 0),
+		CGraphicsUtilities::RenderString(800+i, 0, MOF_COLOR_HYELLOW,
 			"|");
 	}
 }
@@ -123,4 +197,5 @@ void CPlayer::RenderDebugText(void){
  */
 void CPlayer::Release(void){
 	m_Mesh.Release();
+	m_ShotMesh.Release();
 }

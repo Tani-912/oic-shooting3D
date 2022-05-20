@@ -23,6 +23,7 @@ CVector3	gCameraPos;
 CVector3	gTargetPos;
 CVector3	gUpVecter;
 
+
 /*************************************************************************//*!
 		@brief			アプリケーションの初期化
 		@param			None
