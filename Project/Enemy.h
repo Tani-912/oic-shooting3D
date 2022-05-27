@@ -2,24 +2,23 @@
 
 #include "GameDefine.h"
 
-// ˆÚ“®‘¬“x
-#define PLAYERSHOT_SPEED	(0.4f)
-
-class CPlayerShot{
+class CEnemy{
 private:
 	CMeshContainer*		m_pMesh;
 	Vector3				m_Pos;
+	Vector3				m_Rot;
 	bool				m_bShow;
-	PlayerShotMode		m_Mode;
+
+	float				m_AnimTime;
+
 public:
-	CPlayerShot();
-	~CPlayerShot();
+	CEnemy();
+	~CEnemy();
 	void Initialize();
-	void Fire(const Vector3& p);
+	void Start(const Vector3& p);
 	void Update();
 	void Render();
-	void SetMesh(CMeshContainer *pm){ m_pMesh = pm; }
+	void RenderDebugText(int i);
+	void SetMesh(CMeshContainer* pm){ m_pMesh = pm; }
 	bool GetShow(){ return m_bShow; }
-
-	
 };

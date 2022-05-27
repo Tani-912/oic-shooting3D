@@ -22,6 +22,8 @@ private:
 	CMeshContainer  m_ShotMesh;
 	CPlayerShot     m_ShotArray[PLAYERSHOT_COUNT];
 	int				m_ShotWait;
+
+	PlayerShotMode		m_SMode;
 public:
 	CPlayer();
 	~CPlayer();
@@ -33,7 +35,8 @@ public:
 	const CVector3 GetPosition(){ return m_Pos; }
 	void Release();
 
-	void UpdateSIngle();
-	void UpdateDouble();
-	void UpdateTriple();
+	void UpdateMode();
+	void UpdateSingleMode();
+	void UpdateDoubleMode();
+	//void UpdateTrippleMode();
 };
