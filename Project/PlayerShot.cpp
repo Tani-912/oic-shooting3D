@@ -58,3 +58,10 @@ void CPlayerShot::Render(void){
 	m_pMesh->Render(wMat);
 
 }
+
+void CPlayerShot::RenderDebug(void) {
+	if (!m_bShow)
+		return;
+
+	CGraphicsUtilities::RenderSphere(GetSphere(), Vector4(0, 1, 0, 0.3));
+}
