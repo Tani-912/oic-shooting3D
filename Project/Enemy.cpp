@@ -23,6 +23,9 @@ m_Pos(0,0,0),
 m_Rot(0,0,0),
 m_bShow(false),
 m_HP(5),
+m_ShotWait(0),
+m_ShotWaitSet(0),
+m_TargetPos(0,0,0),
 m_AnimTime(0){
 }
 
@@ -53,6 +56,9 @@ void CEnemy::Start(const Vector3& p){
 	m_Rot = Vector3(0, 0, 0);
 	m_bShow = true;
 	m_HP = 5;
+	m_ShotWait = 0;
+	m_ShotWaitSet = 40;
+	m_TargetPos = Vector3(0, 0, 0);
 	m_AnimTime = 0;
 }
 
@@ -60,7 +66,7 @@ void CEnemy::Start(const Vector3& p){
  * çXêV
  *
  */
-void CEnemy::Update(){
+void CEnemy::Update(CEnemyShot* shot,int smax){
 	if (!GetShow()) {
 		return;
 	}
@@ -69,6 +75,24 @@ void CEnemy::Update(){
 
 	m_Pos.y = InterpolationAnim(m_AnimTime, g_EnemyAnimPosY, 2);
 	m_Pos.z = InterpolationAnim(m_AnimTime, g_EnemyAnimPosZ, 5);
+
+	if (g_EnemyAnimPosY[1].Time < m_AnimTime) {
+		if (m_ShotWait <= 0) {
+			CEnemyShot* newShot = CEnemyShot::FindAvailableShot(shot, smax);
+			if (newShot) {
+				m_ShotWait = m_ShotWaitSet;
+				Vector3 direction = m_TargetPos - m_Pos;
+				float distance = CVector3Utilities::Length(direction);
+				if (direction > 0) {
+					direction /= distance;
+					newShot->Fire(m_Pos, direction * 0.075f);
+				}
+			}
+		}
+		else {
+			m_ShotWait--;
+		}
+	}
 
 	if (g_EnemyAnimPosZ[4].Time < m_AnimTime)
 		m_bShow = false;

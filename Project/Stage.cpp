@@ -67,10 +67,10 @@ void CStage::Update(CEnemy* ene,int ecnt){
 		m_EnemyNo++;
 	}
 
-	if (m_Scroll > 1100) {
+	/*if (m_Scroll > 1100) {
 		m_Scroll = 0;
 		m_EnemyNo = 0;
-	}
+	}*/
 }
 
 /**

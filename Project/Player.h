@@ -47,4 +47,6 @@ public:
 
 	void CollisionEnemy(CEnemy& ene);
 	bool IsDead() { return m_bDead; }
+
+	void CollisionEnemyShot(CEnemyShot& shot);
 };
