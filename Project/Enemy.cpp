@@ -51,7 +51,7 @@ void CEnemy::Initialize(){
  * 開始
  *
  */
-void CEnemy::Start(const Vector3& p){
+void CEnemy::Start(const Vector3& p,int t){
 	m_Pos = p;
 	m_Rot = Vector3(0, 0, 0);
 	m_bShow = true;
@@ -60,6 +60,18 @@ void CEnemy::Start(const Vector3& p){
 	m_ShotWaitSet = 40;
 	m_TargetPos = Vector3(0, 0, 0);
 	m_AnimTime = 0;
+
+	m_Type = t;
+	switch (m_Type)
+	{
+	case 1:
+	case 2:
+	case 3:
+		m_HP = 100;
+		m_ShotWaitSet = 100;
+		m_ShotWait = m_ShotWaitSet;
+		break;
+	}
 }
 
 /**
@@ -71,7 +83,15 @@ void CEnemy::Update(CEnemyShot* shot,int smax){
 		return;
 	}
 
-	m_AnimTime += CUtilities::GetFrameSecond();
+	switch (m_Type)
+	{
+	case 0:		UpdateType0(shot, smax);		break;
+	case 1:
+	case 2:
+	case 3:		UpdateBossParts(shot, smax);	break;
+	}
+
+	/*m_AnimTime += CUtilities::GetFrameSecond();
 
 	m_Pos.y = InterpolationAnim(m_AnimTime, g_EnemyAnimPosY, 2);
 	m_Pos.z = InterpolationAnim(m_AnimTime, g_EnemyAnimPosZ, 5);
@@ -95,8 +115,64 @@ void CEnemy::Update(CEnemyShot* shot,int smax){
 	}
 
 	if (g_EnemyAnimPosZ[4].Time < m_AnimTime)
-		m_bShow = false;
+		m_bShow = false;*/
 }
+
+/**
+ * 更新
+ * m_Type が 0 の敵の更新関数
+ * Update 関数から switch でタイプが一致した場合のみ実行
+ */
+void CEnemy::UpdateType0(CEnemyShot* shot, int smax) {
+	// 時間を進める
+	m_AnimTime += CUtilities::GetFrameSecond();
+	// アニメーション
+	m_Pos.y = InterpolationAnim(m_AnimTime, g_EnemyAnimPosY, 2);
+	m_Pos.z = InterpolationAnim(m_AnimTime, g_EnemyAnimPosZ, 5);
+	// プレイヤーと同じ高さまで移動したら
+	if (g_EnemyAnimPosY[1].Time < m_AnimTime)
+	{
+		// 弾の発射
+		if (m_ShotWait <= 0)
+		{
+			CEnemyShot* newShot = CEnemyShot::FindAvailableShot(shot, smax);
+			if (newShot)
+			{
+				m_ShotWait = m_ShotWaitSet;
+				// 目標地点に向かうための方向
+				Vector3 direction = m_TargetPos - m_Pos;
+				// 目標地点までの距離を求める
+				float distance = CVector3Utilities::Length(direction);
+				// 距離が0以下=完全に同じ位置の場合は発射をしない
+				if (distance > 0)
+				{
+					// 方向を正規化
+					direction /= distance;
+					newShot->Fire(m_Pos, direction * 0.075f);
+				}
+			}
+		}
+		else
+		{
+			m_ShotWait--;
+		}
+	}
+	// アニメーション終了で消去
+	if (g_EnemyAnimPosZ[4].Time < m_AnimTime)
+	{
+		m_bShow = false;
+	}
+}
+
+/**
+ * 更新
+ * m_Type が 1,2,3 の敵の更新関数
+ * Update 関数から switch でタイプが一致した場合のみ実行
+ */
+void CEnemy::UpdateBossParts(CEnemyShot* shot, int smax) {
+}
+
+
 
 /**
  * 描画

@@ -295,6 +295,46 @@ void CPlayer::CollisionEnemyShot(CEnemyShot& shot) {
 }
 
 /**
+ * 当たり判定
+ * 引数のボスに対して当たり判定を実行する。
+ *
+ * 引数
+ * [in]			boss			判定を行うボス
+ */
+void CPlayer::CollisionBoss(CBoss& boss) {
+	if (!boss.GetShow())
+	{
+		return;
+	}
+	CSphere ps = GetSphere();
+	CSphere bs = boss.GetSphere();
+	if (ps.CollisionSphere(bs))
+	{
+		m_bDead = true;
+	}
+	// 弾との判定
+	for (int i = 0; i < PLAYERSHOT_COUNT; i++)
+	{
+		if (!m_ShotArray[i].GetShow())
+		{
+			continue;
+		}
+		CSphere ss = m_ShotArray[i].GetSphere();
+		if (ss.CollisionSphere(bs))
+		{
+			boss.Damage(1);
+			m_ShotArray[i].SetShow(false);
+			break;
+		}
+	}
+	// パーツとの判定
+	for (int i = 0; i < BOSS_PARTS_MAX; i++)
+	{
+		CollisionEnemy(boss.GetParts(i));
+	}
+}
+
+/**
  * 解放
  */
 void CPlayer::Release(void){

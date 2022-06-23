@@ -28,4 +28,6 @@ public:
 	void Render();
 	void RenderDebugText();
 	void Release();
+
+	bool IsAllEnemy() { return m_EnemyNo >= m_pEnemyStart->Count; }
 };
